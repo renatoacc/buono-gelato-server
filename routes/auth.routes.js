@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 
 router.post("/signup", async (req, res, next) => {
     try {
-     //console.log(req.body);
+      console.log(req.body);
       const { email, password, firstName, lastName, address, city, postcode, tax, phone } = req.body;
       const userAlreadyExists = await User.findOne({ email });
       if (userAlreadyExists) {
