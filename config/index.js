@@ -42,6 +42,8 @@ module.exports = (app) => {
     })
   );
 
+  app.use(helmet());
+
   // In development environment the app logs
   app.use(logger("dev"));
 
