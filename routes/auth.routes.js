@@ -45,9 +45,9 @@ router.post("/signup", async (req, res, next) => {
 
 router.post("/login", async (req, res, next) => {
   try {
-    //console.log( req.body);
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+    console.log(user);
     if (!user) {
       throw Error();
     }
@@ -64,7 +64,7 @@ router.post("/login", async (req, res, next) => {
     //console.error(err);
 
     return res.status(400).json({
-      errorMessage: "Email already exists, please try a different one!",
+      errorMessage: "Something went wrong - email or password don't match",
     });
   }
 });
