@@ -29,7 +29,7 @@ router.post("/order", csrfMiddleware, isLoggedIn, async (req, res, next) => {
       checkout,
     });
     await newOrder.save();
-    res.json({ message: "Succesfully created todo", todo: newOrder });
+    res.json({ message: "Succesfully created order", order: newOrder });
   } catch (err) {
     res.status(400).json({
       errorMessage: "Please provide correct request body! " + err.message,
