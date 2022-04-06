@@ -2,11 +2,13 @@ const router = require("express").Router();
 const isLoggedIn = require("../middlewares/isLoggedIn");
 const Ingredients = require("../models/Ingredients.model");
 const Product = require("../models/Products.model");
+const Orders = require("../models/Orders.model")
+const isAdmin = require("../middlewares/isAdmin")
 
 
 //PRODUCTS ROUTES
 
-router.get("/products", isLoggedIn, async (req, res, next) => {
+router.get("/products", isLoggedIn, isAdmin, async (req, res, next) => {
     try {
         const product = await Product.find();
         res.json({ product });
@@ -17,7 +19,7 @@ router.get("/products", isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post("/products", isLoggedIn, async (req, res, next) => {
+router.post("/products", isLoggedIn, isAdmin, async (req, res, next) => {
     try {
         const { name, typeProduct, price, extraIngredients } = req.body;
         const newProduct = new Product({ name, typeProduct, price, extraIngredients });
@@ -31,7 +33,7 @@ router.post("/products", isLoggedIn, async (req, res, next) => {
 });
 
 
-router.put("/products", isLoggedIn, async (req, res, next) => {
+router.put("/products", isLoggedIn, isAdmin, async (req, res, next) => {
     try {
         const { _id, name, typeProduct, price, extraIngredients } = req.body;
         if (!_id) {
@@ -55,7 +57,7 @@ router.put("/products", isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.delete("/products", isLoggedIn, async (req, res, next) => {
+router.delete("/products", isLoggedIn, isAdmin, async (req, res, next) => {
     try {
         const { id } = req.body;
         await Product.findByIdAndDelete(id);
@@ -70,7 +72,7 @@ router.delete("/products", isLoggedIn, async (req, res, next) => {
 
 //INGREDIENTS ROUTES
 
-router.get("/ingredients", isLoggedIn, async (req, res, next) => {
+router.get("/ingredients", isLoggedIn, isAdmin, async (req, res, next) => {
     try {
         const ingredient = await Ingredients.find();
         res.json({ ingredient });
@@ -81,7 +83,7 @@ router.get("/ingredients", isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post("/ingredients", isLoggedIn, async (req, res, next) => {
+router.post("/ingredients", isLoggedIn, isAdmin, async (req, res, next) => {
     try {
         const { name, typeProduct, price } = req.body;
         const newIngredient = new Product({ name, typeProduct, price });
@@ -94,7 +96,7 @@ router.post("/ingredients", isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.put("/ingredients", isLoggedIn, async (req, res, next) => {
+router.put("/ingredients", isLoggedIn, isAdmin, async (req, res, next) => {
     try {
         const { _id, name, typeProduct, price } = req.body;
         if (!_id) {
@@ -118,7 +120,7 @@ router.put("/ingredients", isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.delete("/ingredients", isLoggedIn, async (req, res, next) => {
+router.delete("/ingredients", isLoggedIn, isAdmin, async (req, res, next) => {
     try {
         const { id } = req.body;
         await Ingredients.findByIdAndDelete(id);
@@ -130,4 +132,19 @@ router.delete("/ingredients", isLoggedIn, async (req, res, next) => {
     }
 
 });
+
+//ORDERS ROUTES
+
+router.get("/vieworders", isLoggedIn, isAdmin, async (req, res, next) => {
+    try {
+        const orders = await Orders.find();
+        res.json({ orders });
+    } catch (err) {
+        res.status(400).json({
+            errorMessage: "Error in fetching orders from server! " + err.message,
+        });
+    }
+});
+
+
     module.exports = router;
