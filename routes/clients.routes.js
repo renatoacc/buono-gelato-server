@@ -2,9 +2,10 @@ const router = require("express").Router();
 const Product = require("../models/Products.model");
 const Order = require("../models/Orders.model");
 const isLoggedIn = require("../middlewares/isLoggedIn");
+const csrfMiddleware = require("../middlewares/csrfMiddleware");
 
 //list products
-router.get("/shop", isLoggedIn, (req, res, next) => {
+router.get("/shop", csrfMiddleware, isLoggedIn, (req, res, next) => {
   try {
     const listProducts = Product.find();
     res.json({ listProducts });
@@ -17,7 +18,7 @@ router.get("/shop", isLoggedIn, (req, res, next) => {
 });
 
 //create order
-router.post("/order", isLoggedIn, async (req, res, next) => {
+router.post("/order", csrfMiddleware, isLoggedIn, async (req, res, next) => {
   try {
     const { number, clientName, products, quantity, checkout } = req.body;
     const newOrder = new Order({
