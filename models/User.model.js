@@ -20,11 +20,11 @@ const userSchema = new Schema(
       required: true,
     },
     postcode: {
-      type: String,
+      type: Number,
       required: true,
     },
     tax: {
-      type: String,
+      type: Number,
       required: true,
       unique: true,
     },
@@ -41,10 +41,10 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    confirmPassword: {
+    userType: {
       type: String,
-      required: true,
-    },
+      default: "client", 
+    }
 
   },
   {

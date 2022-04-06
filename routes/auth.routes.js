@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 router.post("/signup", async (req, res, next) => {
     try {
      //console.log(req.body);
-      const { email, password } = req.body;
+      const { email, password, firstName, lastName, address, city, postcode, tax, phone } = req.body;
       const userAlreadyExists = await User.findOne({ email });
       if (userAlreadyExists) {
         return res.status(400).json({
@@ -15,7 +15,7 @@ router.post("/signup", async (req, res, next) => {
       }
       const salt = await bcrypt.genSalt(10);
       const passwordHash = await bcrypt.hash(password, salt);
-      const user = await new User({ email, password: passwordHash });
+      const user = await new User({ email, password: passwordHash, firstName, lastName, address, city, postcode, tax, phone });
       await user.save();
   
       return res.json({ message: "Successfully signed up user" });
@@ -49,3 +49,14 @@ router.post("/signup", async (req, res, next) => {
       });
     }
   });
+
+  router.post("/logout", async (req, res, next) => {
+    //console.log("Trying to logout!");
+  
+    req.session.destroy((err) => {
+      if (err) next(err);
+      return res.json({ message: "Successfully logged out!" });
+    });
+  });
+
+  module.exports = router;
