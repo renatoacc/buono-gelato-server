@@ -18,7 +18,7 @@ const productSchema = new Schema({
   },
   extraIngredients: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "ingredients",
+    ref: "Ingredients",
   },
 });
 
