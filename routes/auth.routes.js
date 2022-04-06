@@ -3,6 +3,7 @@ const User = require("../models/User.model");
 const bcrypt = require("bcrypt");
 
 router.post("/signup", async (req, res, next) => {
+
     try {
       console.log(req.body);
       const { email, password, firstName, lastName, address, city, postcode, tax, phone } = req.body;
@@ -44,8 +45,9 @@ router.post("/login", async (req, res, next) => {
     return res.json({ message: "Successfully logged in!", user: sessionUser });
   } catch (err) {
     //console.error(err);
+
     return res.status(400).json({
-      errorMessage: "Something went wrong - username and password don't match",
+      errorMessage: "Email already exists, please try a different one!",
     });
   }
 });
