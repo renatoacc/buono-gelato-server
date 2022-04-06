@@ -8,7 +8,6 @@ router.get("/", (req, res, next) => {
 // example: router.use("/auth", authRoutes)
 router.use(require("./clients.routes"));
 router.use(require("./auth.routes"));
-
-router.use(require("./auth.routes"));
 router.use(require("./admin.routes"));
+
 module.exports = router;
