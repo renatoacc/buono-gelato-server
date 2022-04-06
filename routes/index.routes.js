@@ -7,4 +7,6 @@ router.get("/", (req, res, next) => {
 // You put the next routes here 👇
 // example: router.use("/auth", authRoutes)
 
+router.use(require("./auth.routes"));
+router.use(require("./admin.routes"));
 module.exports = router;
