@@ -3,28 +3,45 @@ const User = require("../models/User.model");
 const bcrypt = require("bcrypt");
 
 router.post("/signup", async (req, res, next) => {
-
-    try {
-      console.log(req.body);
-      const { email, password, firstName, lastName, address, city, postcode, tax, phone } = req.body;
-      const userAlreadyExists = await User.findOne({ email });
-      if (userAlreadyExists) {
-        return res.status(400).json({
-          errorMessage: "Email already exists, please try a different one!",
-        });
-      }
-      const salt = await bcrypt.genSalt(10);
-      const passwordHash = await bcrypt.hash(password, salt);
-      const user = await new User({ email, password: passwordHash, firstName, lastName, address, city, postcode, tax, phone });
-      await user.save();
-  
-      return res.json({ message: "Successfully signed up user" });
-    } catch (err) {
-      console.error(err);
-      return res.status(400).json({ errorMessage: "Something went wrong!" });
+  try {
+    console.log(req.body);
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      address,
+      city,
+      postcode,
+      vat,
+      phone,
+    } = req.body;
+    const userAlreadyExists = await User.findOne({ email });
+    if (userAlreadyExists) {
+      return res.status(400).json({
+        errorMessage: "Email already exists, please try a different one!",
+      });
     }
-  });
-
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+    const user = await new User({
+      email,
+      password: passwordHash,
+      firstName,
+      lastName,
+      address,
+      city,
+      postcode,
+      vat,
+      phone,
+    });
+    await user.save();
+    return res.json({ message: "Successfully signed up user" });
+  } catch (err) {
+    console.error(err);
+    return res.status(400).json({ errorMessage: "Something went wrong!" });
+  }
+});
 
 router.post("/login", async (req, res, next) => {
   try {
