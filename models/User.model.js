@@ -23,7 +23,7 @@ const userSchema = new Schema(
       type: Number,
       required: true,
     },
-    tax: {
+    vat: {
       type: Number,
       required: true,
       unique: true,
@@ -43,9 +43,8 @@ const userSchema = new Schema(
     },
     userType: {
       type: String,
-      default: "client", 
-    }
-
+      default: "client",
+    },
   },
   {
     timestamps: true,
