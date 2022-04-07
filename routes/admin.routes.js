@@ -5,18 +5,9 @@ const Product = require("../models/Products.model");
 const Orders = require("../models/Orders.model");
 const isAdmin = require("../middlewares/isAdmin");
 const csrfMiddleware = require("../middlewares/csrfMiddleware");
-const multer = require('multer');
+const upload = require("../middlewares/uploadImage");
+const singleUpload = upload.single("productImage");
 
-const storage = multer.diskStorage({
-    destination: function(req, file, cb){
-        cb(null, "./uploads/");
-    },
-    filename: function(req,file,cb){
-        cb(null, file.originalname);
-    },
-});
-
-const upload = multer({storage: storage});
 //PRODUCTS ROUTES
 
 router.get(
@@ -36,67 +27,57 @@ router.get(
   }
 );
 
-router.post(
+router.post("/products", singleUpload, async (req, res, next) => {
+    //console.log(">>>>>>>>>>>>>>>>>>>>>>>",  req.file.location)
+    try {
+      const { name, typeProduct, price, extraIngredients } = req.body;
+      const newProduct = new Product({
+        name,
+        typeProduct,
+        price,
+        extraIngredients,
+        productImage: req.file.location,
 
-    "/products",
-     upload.single("productImage"),
-    async (req, res, next) => {
-        //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file, req.body)
-        try {
-            const { name, typeProduct, price, extraIngredients} = req.body;
-            const  image  = req.file.path
-            const newProduct = new Product({
-                name,
-                typeProduct,
-                price,
-                extraIngredients,
-                productImage: image
-            });
-            await newProduct.save();
-            res.json({ message: "Succesfully created Product", product: newProduct });
-        } catch (err) {
-            res.status(400).json({
-                errorMessage: "Please provide correct request body! " + err.message,
-            });
-        }
-
+      });
+      await newProduct.save();
+      res.json({ message: "Succesfully created Product", product: newProduct });
+    } catch (err) {
+      res.status(400).json({
+        errorMessage: "Please provide correct request body! " + err.message,
+      });
     }
+
   }
 );
 
-router.put(
-
-    "/products",
-   
-    upload.single("productImage"),
-    async (req, res, next) => {
-        console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file,">>>>>>>>>>>>>>", req.body)
-        try {
-            const { _id, name, typeProduct, price, extraIngredients} = req.body;
-            const  image  = req.file.path;
-            if (!_id) {
-                return res
-                    .status(400)
-                    .json({ errorMessage: "Please provide a valid _id in your request" });
-            }
-            const afterUpdateProduct = await Product.findByIdAndUpdate(
-                _id,
-                { name, typeProduct, price, extraIngredients},
-                {productImage: image},
-                { new: true }
-            );
-            res.json({
-                message: "Successfully updated product!",
-                updatedProduct: afterUpdateProduct,
-            });
-        } catch (err) {
-            res
-                .status(400)
-                .json({ errorMessage: "Error in updating product! " + err.message });
-        }
-
+router.put("/products", singleUpload,
+  async (req, res, next) => {
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file, ">>>>>>>>>>>>>>", req.body)
+    try {
+      const { _id, name, typeProduct, price, extraIngredients } = req.body;
+      const image = req.file.location;
+      if (!_id) {
+        return res
+          .status(400)
+          .json({ errorMessage: "Please provide a valid _id in your request" });
+      }
+      const afterUpdateProduct = await Product.findByIdAndUpdate(
+        _id,
+        { name, typeProduct, price, extraIngredients, productImage:image },
+        { new: true }
+      );
+      res.json({
+        message: "Successfully updated product!",
+        updatedProduct: afterUpdateProduct,
+      });
+    } catch (err) {
+      res
+        .status(400)
+        .json({ errorMessage: "Error in updating product! " + err.message });
     }
+
   }
+
 );
 
 router.delete(
