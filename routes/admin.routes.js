@@ -5,6 +5,18 @@ const Product = require("../models/Products.model");
 const Orders = require("../models/Orders.model");
 const isAdmin = require("../middlewares/isAdmin");
 const csrfMiddleware = require("../middlewares/csrfMiddleware");
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+    destination: function(req, file, cb){
+        cb(null, "./uploads/");
+    },
+    filename: function(req,file,cb){
+        cb(null, file.originalname);
+    },
+});
+
+const upload = multer({storage: storage});
 //PRODUCTS ROUTES
 
 router.get(
@@ -26,17 +38,18 @@ router.get(
 
 router.post(
     "/products",
-    csrfMiddleware,
-    isLoggedIn,
-    isAdmin,
+     upload.single("productImage"),
     async (req, res, next) => {
+        //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file, req.body)
         try {
-            const { name, typeProduct, price, extraIngredients } = req.body;
+            const { name, typeProduct, price, extraIngredients} = req.body;
+            const  image  = req.file.path
             const newProduct = new Product({
                 name,
                 typeProduct,
                 price,
                 extraIngredients,
+                productImage: image
             });
             await newProduct.save();
             res.json({ message: "Succesfully created Product", product: newProduct });
@@ -50,12 +63,13 @@ router.post(
 
 router.put(
     "/products",
-    csrfMiddleware,
-    isLoggedIn,
-    isAdmin,
+   
+    upload.single("productImage"),
     async (req, res, next) => {
+        console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file,">>>>>>>>>>>>>>", req.body)
         try {
-            const { _id, name, typeProduct, price, extraIngredients } = req.body;
+            const { _id, name, typeProduct, price, extraIngredients} = req.body;
+            const  image  = req.file.path;
             if (!_id) {
                 return res
                     .status(400)
@@ -63,7 +77,8 @@ router.put(
             }
             const afterUpdateProduct = await Product.findByIdAndUpdate(
                 _id,
-                { name, typeProduct, price, extraIngredients },
+                { name, typeProduct, price, extraIngredients},
+                {productImage: image},
                 { new: true }
             );
             res.json({
