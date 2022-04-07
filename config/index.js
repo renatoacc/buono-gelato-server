@@ -9,6 +9,9 @@ const logger = require("morgan");
 // https://www.npmjs.com/package/cookie-parser
 const cookieParser = require("cookie-parser");
 
+// ADDED: require mongostore
+const MongoStore = require("connect-mongo");
+
 // ℹ️ Needed to accept from requests from 'the outside'. CORS stands for cross origin resource sharing
 // unless the request if from the same domain, by default express wont accept POST requests
 const cors = require("cors");
@@ -21,24 +24,29 @@ module.exports = (app) => {
   app.set("trust proxy", 1);
 
   // controls a very specific header to pass headers from the frontend
-  // app.use(
-  //   session({
-  //     secret: process.env.SESS_SECRET,
-  //     resave: true,
-  //     saveUninitialized: false,
-  //     cookie: {
-  //       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  //       secure: process.env.NODE_ENV === "production",
-  //       httpOnly: true,
-  //       maxAge: 600000, // 60 * 1000 ms * 10 === 10 min
-  //     },
-  //   })
-  // );
-
   app.use(
     cors({
       credentials: true,
       origin: process.env.ORIGIN || "http://localhost:3000",
+    })
+  );
+
+  // controls a very specific header to pass headers from the frontend
+  app.use(
+    session({
+      secret: process.env.SESS_SECRET,
+      resave: true,
+      saveUninitialized: false,
+      cookie: {
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        secure: process.env.NODE_ENV === "production",
+        httpOnly: true,
+        maxAge: 600000, // 60 * 1000 ms * 10 === 10 min
+      },
+      store: MongoStore.create({
+        mongoUrl:
+          process.env.MONGODB_URI || "mongodb://localhost/buono-gelato-app",
+      }),
     })
   );
 

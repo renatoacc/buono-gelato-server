@@ -58,7 +58,7 @@ router.post("/login", async (req, res, next) => {
 
     const sessionUser = { email: user.email, _id: user._id };
     req.session.user = sessionUser;
-    //console.log(req.session);
+    // console.log("ERROOOOOOOOOOO ESTÁ AQUI ", req.session);
     return res.json({ message: "Successfully logged in!", user: sessionUser });
   } catch (err) {
     //console.error(err);
