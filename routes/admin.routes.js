@@ -5,18 +5,18 @@ const Product = require("../models/Products.model");
 const Orders = require("../models/Orders.model");
 const isAdmin = require("../middlewares/isAdmin");
 const csrfMiddleware = require("../middlewares/csrfMiddleware");
-const multer = require('multer');
+const multer = require("multer");
 
 const storage = multer.diskStorage({
-    destination: function(req, file, cb){
-        cb(null, "./uploads/");
-    },
-    filename: function(req,file,cb){
-        cb(null, file.originalname);
-    },
+  destination: function (req, file, cb) {
+    cb(null, "./uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
 });
 
-const upload = multer({storage: storage});
+const upload = multer({ storage: storage });
 //PRODUCTS ROUTES
 
 router.get(
@@ -37,64 +37,63 @@ router.get(
 );
 
 router.post(
-
-    "/products",
-     upload.single("productImage"),
-    async (req, res, next) => {
-        //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file, req.body)
-        try {
-            const { name, typeProduct, price, extraIngredients} = req.body;
-            const  image  = req.file.path
-            const newProduct = new Product({
-                name,
-                typeProduct,
-                price,
-                extraIngredients,
-                productImage: image
-            });
-            await newProduct.save();
-            res.json({ message: "Succesfully created Product", product: newProduct });
-        } catch (err) {
-            res.status(400).json({
-                errorMessage: "Please provide correct request body! " + err.message,
-            });
-        }
-
+  "/products",
+  // upload.single("productImage"),
+  async (req, res, next) => {
+    //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file, req.body)
+    try {
+      const { name, typeProduct, price, extraIngredients } = req.body;
+      // const image = req.file.path;
+      const newProduct = new Product({
+        name,
+        typeProduct,
+        price,
+        extraIngredients,
+        // productImage: image,
+      });
+      await newProduct.save();
+      res.json({ message: "Succesfully created Product", product: newProduct });
+    } catch (err) {
+      res.status(400).json({
+        errorMessage: "Please provide correct request body! " + err.message,
+      });
     }
   }
 );
 
 router.put(
+  "/products",
 
-    "/products",
-   
-    upload.single("productImage"),
-    async (req, res, next) => {
-        console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file,">>>>>>>>>>>>>>", req.body)
-        try {
-            const { _id, name, typeProduct, price, extraIngredients} = req.body;
-            const  image  = req.file.path;
-            if (!_id) {
-                return res
-                    .status(400)
-                    .json({ errorMessage: "Please provide a valid _id in your request" });
-            }
-            const afterUpdateProduct = await Product.findByIdAndUpdate(
-                _id,
-                { name, typeProduct, price, extraIngredients},
-                {productImage: image},
-                { new: true }
-            );
-            res.json({
-                message: "Successfully updated product!",
-                updatedProduct: afterUpdateProduct,
-            });
-        } catch (err) {
-            res
-                .status(400)
-                .json({ errorMessage: "Error in updating product! " + err.message });
-        }
-
+  upload.single("productImage"),
+  async (req, res, next) => {
+    console.log(
+      ">>>>>>>>>>>>>>>>>>>>>>>",
+      req.file,
+      ">>>>>>>>>>>>>>",
+      req.body
+    );
+    try {
+      const { _id, name, typeProduct, price, extraIngredients } = req.body;
+      const image = req.file.path;
+      if (!_id) {
+        return res
+          .status(400)
+          .json({ errorMessage: "Please provide a valid _id in your request" });
+      }
+      const afterUpdateProduct = await Product.findByIdAndUpdate(
+        _id,
+        { name, typeProduct, price, extraIngredients },
+        { productImage: image },
+        { new: true }
+      );
+      res.json({
+        message: "Successfully updated product!",
+        updatedProduct: afterUpdateProduct,
+      });
+    } catch (err) {
+      res
+        .status(400)
+        .json({ errorMessage: "Error in updating product! " + err.message });
     }
   }
 );
