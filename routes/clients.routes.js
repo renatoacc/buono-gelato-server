@@ -5,17 +5,36 @@ const isLoggedIn = require("../middlewares/isLoggedIn");
 const csrfMiddleware = require("../middlewares/csrfMiddleware");
 
 //list products
-router.get("/shop", csrfMiddleware, isLoggedIn, (req, res, next) => {
+router.get("/shop", csrfMiddleware, isLoggedIn, async (req, res, next) => {
   try {
-    const listProducts = Product.find();
-    res.json({ listProducts });
+    const listProducts = await Product.find();
     console.log(listProducts);
+    res.json(listProducts);
   } catch (err) {
     res.status(400).json({
       errorMessage: "Error in fetching products from server! " + err.message,
     });
   }
 });
+
+// find one product
+router.get(
+  "/:productId",
+  csrfMiddleware,
+  isLoggedIn,
+  async (req, res, next) => {
+    try {
+      const { id } = req.body;
+      const oneProducts = await Product.findById(id);
+      console.log(oneProducts);
+      res.json(oneProducts);
+    } catch (err) {
+      res.status(400).json({
+        errorMessage: "Error in fetching products from server! " + err.message,
+      });
+    }
+  }
+);
 
 //create order
 router.post("/order", csrfMiddleware, isLoggedIn, async (req, res, next) => {
