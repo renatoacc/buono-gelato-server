@@ -37,6 +37,8 @@ router.get(
   }
 );
 
+// creat get to check the number of the order.
+
 //create order
 router.post("/order", csrfMiddleware, isLoggedIn, async (req, res, next) => {
   try {
