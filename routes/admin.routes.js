@@ -5,18 +5,8 @@ const Product = require("../models/Products.model");
 const Orders = require("../models/Orders.model");
 const isAdmin = require("../middlewares/isAdmin");
 const csrfMiddleware = require("../middlewares/csrfMiddleware");
-const multer = require("multer");
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
 
-const upload = multer({ storage: storage });
 const upload = require("../middlewares/uploadImage");
 const singleUpload = upload.single("productImage");
 
@@ -60,7 +50,7 @@ router.post("/products", singleUpload, async (req, res, next) => {
 });
 
 router.put("/products", singleUpload, async (req, res, next) => {
-  console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file, ">>>>>>>>>>>>>>", req.body);
+  //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file, ">>>>>>>>>>>>>>", req.body);
   try {
     const { _id, name, typeProduct, price, extraIngredients } = req.body;
     const image = req.file.location;
@@ -85,16 +75,15 @@ router.put("/products", singleUpload, async (req, res, next) => {
   }
 });
 
-router.delete(
-  "/products",
-  csrfMiddleware,
-  isLoggedIn,
-  isAdmin,
+router.post(
+  "/products/delete/:id",
+
   async (req, res, next) => {
+    //console.log(">>>>>>>>>>>>>>", req.params);
     try {
-      const { id } = req.body;
+      const {id} = req.params;
       await Product.findByIdAndDelete(id);
-      res.json({ message: "Successfully delete Product" + id });
+      res.json({ message: "Successfully delete Product " + id });
     } catch (err) {
       res
         .status(400)
@@ -107,9 +96,7 @@ router.delete(
 
 router.get(
   "/ingredients",
-  csrfMiddleware,
-  isLoggedIn,
-  isAdmin,
+
   async (req, res, next) => {
     try {
       const ingredient = await Ingredients.find();
@@ -125,17 +112,17 @@ router.get(
 
 router.post(
   "/ingredients",
-  csrfMiddleware,
-  isLoggedIn,
-  isAdmin,
+
   async (req, res, next) => {
+
     try {
+      console.log( ">>>>>>>>>>>>>>", req.body);
       const { name, typeProduct, price } = req.body;
-      const newIngredient = new Product({ name, typeProduct, price });
+      const newIngredient = new Ingredients({ name, typeProduct, price });
       await newIngredient.save();
       res.json({
         message: "Succesfully create new Ingredient",
-        product: newIngredient,
+        ingredient: newIngredient,
       });
     } catch (err) {
       res.status(400).json({
@@ -147,9 +134,7 @@ router.post(
 
 router.put(
   "/ingredients",
-  csrfMiddleware,
-  isLoggedIn,
-  isAdmin,
+ 
   async (req, res, next) => {
     try {
       const { _id, name, typeProduct, price } = req.body;
@@ -175,14 +160,12 @@ router.put(
   }
 );
 
-router.delete(
-  "/ingredients",
-  csrfMiddleware,
-  isLoggedIn,
-  isAdmin,
+router.post(
+  "/ingredients/delete/:id",
+
   async (req, res, next) => {
     try {
-      const { id } = req.body;
+      const { id } = req.params;
       await Ingredients.findByIdAndDelete(id);
       res.json({ message: "Successfully delete ingredient" + id });
     } catch (err) {
