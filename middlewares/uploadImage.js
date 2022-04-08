@@ -23,7 +23,7 @@ const s3 = new aws.S3({
 const upload = multer({
     fileFilter,
     storage: multerS3({
-        // acl: "public-read",
+        //acl: "public-read",
         s3,
         bucket:"buono-gelato-app-products-image",
         metadata: function(req,file,cb){
