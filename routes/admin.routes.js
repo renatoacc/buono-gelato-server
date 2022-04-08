@@ -6,7 +6,6 @@ const Orders = require("../models/Orders.model");
 const isAdmin = require("../middlewares/isAdmin");
 const csrfMiddleware = require("../middlewares/csrfMiddleware");
 
-
 const upload = require("../middlewares/uploadImage");
 const singleUpload = upload.single("productImage");
 

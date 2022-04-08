@@ -19,12 +19,13 @@ router.get("/shop", csrfMiddleware, isLoggedIn, async (req, res, next) => {
 
 // find one product
 router.get(
-  "/:productId",
+  "/product/:id",
   csrfMiddleware,
   isLoggedIn,
   async (req, res, next) => {
     try {
-      const { id } = req.body;
+      const { id } = req.params;
+      console.log(id);
       const oneProducts = await Product.findById(id);
       console.log(oneProducts);
       res.json(oneProducts);
