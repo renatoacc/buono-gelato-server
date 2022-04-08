@@ -45,6 +45,8 @@ const userSchema = new Schema(
       type: String,
       default: "client",
     },
+    cart: [],
+    favourites: [],
   },
   {
     timestamps: true,
