@@ -4,6 +4,22 @@ const Order = require("../models/Orders.model");
 const isLoggedIn = require("../middlewares/isLoggedIn");
 const csrfMiddleware = require("../middlewares/csrfMiddleware");
 
+// check if the user have the session
+router.get("/logged", async (req, res, next) => {
+  try {
+    req.session.user ? res.json(req.session.user) : res.json(null);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+router.get("/datauser", async (req, res, next) => {
+  try {
+  } catch (error) {
+    console.error("Erro to get the user data:", error);
+  }
+});
+
 //list products
 router.get("/shop", csrfMiddleware, isLoggedIn, async (req, res, next) => {
   try {
