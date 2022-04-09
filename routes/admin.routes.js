@@ -12,7 +12,7 @@ const singleUpload = upload.single("productImage");
 //PRODUCTS ROUTES
 
 router.get(
-  "/products",
+  "/showproducts",
   csrfMiddleware,
   isLoggedIn,
   isAdmin,
@@ -29,7 +29,7 @@ router.get(
 );
 
 router.post("/products", singleUpload, async (req, res, next) => {
-  //console.log(">>>>>>>>>>>>>>>>>>>>>>>",  req.file.location)
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.body)
   try {
     const { name, typeProduct, price, extraIngredients } = req.body;
     const newProduct = new Product({
@@ -37,7 +37,7 @@ router.post("/products", singleUpload, async (req, res, next) => {
       typeProduct,
       price,
       extraIngredients,
-      productImage: req.file.location,
+      // productImage: req.file.location,
     });
     await newProduct.save();
     res.json({ message: "Succesfully created Product", product: newProduct });
@@ -94,7 +94,7 @@ router.post(
 //INGREDIENTS ROUTES
 
 router.get(
-  "/ingredients",
+  "/showingredients",
 
   async (req, res, next) => {
     try {
