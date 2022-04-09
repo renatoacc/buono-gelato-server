@@ -31,7 +31,7 @@ router.get(
 
 
 router.post("/products", singleUpload, async (req, res, next) => {
-  console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.body)
+  //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.body)
   try {
     const { name, typeProduct, price, extraIngredients, description } = req.body;
     const newProduct = new Product({
@@ -51,21 +51,25 @@ router.post("/products", singleUpload, async (req, res, next) => {
   }
 });
 
-router.put("/products", singleUpload, async (req, res, next) => {
+router.put("/products/:id", singleUpload, async (req, res, next) => {
   //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file, ">>>>>>>>>>>>>>", req.body);
+  //console.log(req.params, req.body)
   try {
-    const { _id, name, typeProduct, price, extraIngredients } = req.body;
-    const image = req.file.location;
-    if (!_id) {
+    const {id}  = req.params
+    const {name, typeProduct, price, description } = req.body;
+    // const image = req.file.location;
+    if (!id) {
       return res
         .status(400)
         .json({ errorMessage: "Please provide a valid _id in your request" });
     }
+    
     const afterUpdateProduct = await Product.findByIdAndUpdate(
-      _id,
-      { name, typeProduct, price, extraIngredients },
+      id,
+      { name, typeProduct, price, description },
       { new: true }
     );
+  
     res.json({
       message: "Successfully updated product!",
       updatedProduct: afterUpdateProduct,
@@ -81,7 +85,7 @@ router.post(
   "/products/delete/:id",
 
   async (req, res, next) => {
-    //console.log(">>>>>>>>>>>>>>", req.params);
+    console.log(">>>>>>>>>>>>>>", req.params);
     try {
       const {id} = req.params;
       await Product.findByIdAndDelete(id);
@@ -164,8 +168,8 @@ router.put(
 
 router.post(
   "/ingredients/delete/:id",
-
   async (req, res, next) => {
+    console.log(req.params)
     try {
       const { id } = req.params;
       await Ingredients.findByIdAndDelete(id);
