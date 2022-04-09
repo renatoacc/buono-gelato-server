@@ -13,13 +13,13 @@ const singleUpload = upload.single("productImage");
 
 router.get(
   "/showproducts",
-  csrfMiddleware,
-  isLoggedIn,
-  isAdmin,
+  // csrfMiddleware,
+  // isLoggedIn,
+  // isAdmin,
   async (req, res, next) => {
     try {
       const product = await Product.find();
-      res.json({ product });
+      res.json( product );
     } catch (err) {
       res.status(400).json({
         errorMessage: "Error in fetching products from server! " + err.message,
@@ -28,14 +28,17 @@ router.get(
   }
 );
 
+
+
 router.post("/products", singleUpload, async (req, res, next) => {
   console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.body)
   try {
-    const { name, typeProduct, price, extraIngredients } = req.body;
+    const { name, typeProduct, price, extraIngredients, description } = req.body;
     const newProduct = new Product({
       name,
       typeProduct,
       price,
+      description,
       extraIngredients,
       // productImage: req.file.location,
     });
@@ -60,7 +63,7 @@ router.put("/products", singleUpload, async (req, res, next) => {
     }
     const afterUpdateProduct = await Product.findByIdAndUpdate(
       _id,
-      { name, typeProduct, price, extraIngredients, productImage: image },
+      { name, typeProduct, price, extraIngredients },
       { new: true }
     );
     res.json({
@@ -99,7 +102,7 @@ router.get(
   async (req, res, next) => {
     try {
       const ingredient = await Ingredients.find();
-      res.json({ ingredient });
+      res.json( ingredient );
     } catch (err) {
       res.status(400).json({
         errorMessage:
@@ -116,8 +119,8 @@ router.post(
 
     try {
       console.log( ">>>>>>>>>>>>>>", req.body);
-      const { name, typeProduct, price } = req.body;
-      const newIngredient = new Ingredients({ name, typeProduct, price });
+      const { name, typeIngredient, price, description } = req.body;
+      const newIngredient = new Ingredients({ name, typeIngredient, price, description });
       await newIngredient.save();
       res.json({
         message: "Succesfully create new Ingredient",
@@ -136,7 +139,7 @@ router.put(
  
   async (req, res, next) => {
     try {
-      const { _id, name, typeProduct, price } = req.body;
+      const { _id, name, typeIngredient, price } = req.body;
       if (!_id) {
         return res
           .status(400)
@@ -144,7 +147,7 @@ router.put(
       }
       const afterUpdateIngredient = await Ingredients.findByIdAndUpdate(
         _id,
-        { name, typeProduct, price },
+        { name, typeIngredient, price },
         { new: true }
       );
       res.json({
