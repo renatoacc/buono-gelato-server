@@ -178,7 +178,7 @@ router.post(
 //ORDERS ROUTES
 
 router.get(
-  "/vieworders",
+  "/orderview",
   csrfMiddleware,
   isLoggedIn,
   isAdmin,
