@@ -5,12 +5,12 @@ const ingredientSchema = new Schema({
     type: String,
     required: true,
   },
-  typeProduct: {
+  typeIngredient: {
     type: String,
     enum: ["Ice-cream", "Topping", "Crunchy"],
     required: true,
   },
-  discription: String,
+  description: String,
   price: {
     type: Number,
     required: true,
