@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Product = require("../models/Products.model");
+const User = require("../models/User.model");
 const Order = require("../models/Orders.model");
 const isLoggedIn = require("../middlewares/isLoggedIn");
 const csrfMiddleware = require("../middlewares/csrfMiddleware");
@@ -13,10 +14,34 @@ router.get("/logged", async (req, res, next) => {
   }
 });
 
-router.get("/datauser", async (req, res, next) => {
+router.get(
+  "/datauser/:id",
+  csrfMiddleware,
+  isLoggedIn,
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      console.log("Get user id:", id);
+      const { _id, firstName, lastName, cart } = await User.findById(id);
+      const oneUserData = { _id, firstName, lastName, cart };
+      res.json(oneUserData);
+    } catch (error) {
+      console.error("Erro to get the user data:", error);
+    }
+  }
+);
+// Update cart Array
+router.put("/addCart", isLoggedIn, async (req, res, next) => {
   try {
+    const { _id, cart } = req.body;
+    console.log("Data form the front end", _id, cart);
+    if (!_id) {
+      return res.status(400).json({ errorMessage: "Error ID" });
+    }
+    await User.findByIdAndUpdate(_id, { cart: cart });
+    res.json({ message: "Cart update Successfully." });
   } catch (error) {
-    console.error("Erro to get the user data:", error);
+    res.status(400).json({ errorMessage: "Erro Update Cart" });
   }
 });
 
@@ -52,6 +77,19 @@ router.get(
     }
   }
 );
+
+// Show cart user information to checkout
+
+router.get("/cart/:id", csrfMiddleware, isLoggedIn, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { _id, firstName, lastName, cart } = await User.findById(id);
+    console.log({ _id, firstName, lastName, cart });
+    res.json({ _id, firstName, lastName, cart });
+  } catch (error) {
+    console.log("Error cart user data", error);
+  }
+});
 
 // creat get to check the number of the order.
 
