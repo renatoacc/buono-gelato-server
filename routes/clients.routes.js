@@ -4,6 +4,7 @@ const User = require("../models/User.model");
 const Order = require("../models/Orders.model");
 const isLoggedIn = require("../middlewares/isLoggedIn");
 const csrfMiddleware = require("../middlewares/csrfMiddleware");
+const Orders = require("../models/Orders.model");
 
 // check if the user have the session
 router.get("/logged", async (req, res, next) => {
@@ -80,8 +81,9 @@ router.get(
 
 // Show cart user information to checkout
 
-router.get("/cart/:id", csrfMiddleware, isLoggedIn, async (req, res, next) => {
+router.get("/cart:id", csrfMiddleware, isLoggedIn, async (req, res, next) => {
   try {
+    console.log("ajkhsdkjahskdjahkdjshakjdshkj", req.params);
     const { id } = req.params;
     const { _id, firstName, lastName, cart } = await User.findById(id);
     console.log({ _id, firstName, lastName, cart });
@@ -92,6 +94,20 @@ router.get("/cart/:id", csrfMiddleware, isLoggedIn, async (req, res, next) => {
 });
 
 // creat get to check the number of the order.
+router.get(
+  "/number/order",
+  csrfMiddleware,
+  isLoggedIn,
+  async (req, res, next) => {
+    try {
+      const { orderNumberArray } = Orders.find();
+      console.log("TOTAL ORDER", orderNumberArray);
+      res.json(orderNumberArray);
+    } catch (error) {
+      console.log("Error get Order Number: ", error);
+    }
+  }
+);
 
 //create order
 router.post("/order", csrfMiddleware, isLoggedIn, async (req, res, next) => {
