@@ -1,5 +1,5 @@
 const isAdmin = (req, res, next) => {
-    if (user.userType === "admin") {
+    if ( user && user.userType === "admin") {
       return next();
     }
     return res
