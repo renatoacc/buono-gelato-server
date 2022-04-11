@@ -5,9 +5,7 @@ const Product = require("../models/Products.model");
 const Orders = require("../models/Orders.model");
 const isAdmin = require("../middlewares/isAdmin");
 const csrfMiddleware = require("../middlewares/csrfMiddleware");
-
-const upload = require("../middlewares/uploadImage");
-const singleUpload = upload.single("productImage");
+const upload= require('../middlewares/cloudinary.config.js');
 
 //PRODUCTS ROUTES
 
@@ -30,17 +28,20 @@ router.get(
 
 
 
-router.post("/products", singleUpload, async (req, res, next) => {
+router.post("/products", upload.single("productImage"), async (req, res, next) => {
   console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.body)
+  console.log('file is: ', req.file)
+
   try {
-    const { name, typeProduct, price, extraIngredients, description, productImage } = req.body;
+    const image = req.file;
+    const { name, typeProduct, price, extraIngredients, description } = req.body;
     const newProduct = new Product({
       name,
       typeProduct,
       price,
       description,
       extraIngredients,
-      productImage,
+      productImage: image.path,
     });
     await newProduct.save();
     res.json({ message: "Succesfully created Product", product: newProduct });
@@ -70,7 +71,7 @@ router.get(
   }
 );
 
-router.put("/products/:id", singleUpload, async (req, res, next) => {
+router.put("/products/:id", async (req, res, next) => {
   //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file, ">>>>>>>>>>>>>>", req.body);
   //console.log(req.params, req.body)
   try {
