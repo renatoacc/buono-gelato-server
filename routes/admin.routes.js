@@ -139,19 +139,21 @@ router.post(
 );
 
 router.put(
-  "/ingredients",
+  "/ingredients/:id",
  
   async (req, res, next) => {
+    console.log(req.params)
     try {
-      const { _id, name, typeIngredient, price } = req.body;
-      if (!_id) {
+    const {id}  = req.params
+    const {name, typeIngredient, price, description } = req.body;
+      if (!id) {
         return res
           .status(400)
           .json({ errorMessage: "Please provide a valid _id in your request" });
       }
       const afterUpdateIngredient = await Ingredients.findByIdAndUpdate(
-        _id,
-        { name, typeIngredient, price },
+        id,
+        { name, typeIngredient, price, description },
         { new: true }
       );
       res.json({
