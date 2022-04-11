@@ -225,13 +225,14 @@ router.post(
 
 router.get(
   "/vieworders",
-  csrfMiddleware,
-  isLoggedIn,
-  isAdmin,
+  // csrfMiddleware,
+  // isLoggedIn,
+  // isAdmin,
   async (req, res, next) => {
     try {
       const orders = await Orders.find();
-      res.json({ orders });
+      res.json( orders );
+      console.log(orders)
     } catch (err) {
       res.status(400).json({
         errorMessage: "Error in fetching orders from server! " + err.message,
