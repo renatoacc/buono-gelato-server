@@ -83,7 +83,6 @@ router.get(
 
 router.get("/cart:id", csrfMiddleware, isLoggedIn, async (req, res, next) => {
   try {
-    console.log("ajkhsdkjahskdjahkdjshakjdshkj", req.params);
     const { id } = req.params;
     const { _id, firstName, lastName, cart } = await User.findById(id);
     console.log({ _id, firstName, lastName, cart });
@@ -93,32 +92,25 @@ router.get("/cart:id", csrfMiddleware, isLoggedIn, async (req, res, next) => {
   }
 });
 
-// creat get to check the number of the order.
-router.get(
-  "/number/order",
-  csrfMiddleware,
-  isLoggedIn,
-  async (req, res, next) => {
-    try {
-      const { orderNumberArray } = Orders.find();
-      console.log("TOTAL ORDER", orderNumberArray);
-      res.json(orderNumberArray);
-    } catch (error) {
-      console.log("Error get Order Number: ", error);
-    }
+router.put("/deleteCart/:id", isLoggedIn, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await User.findByIdAndUpdate(id, { cart: [] });
+    res.json({ message: "Cart delete Successfully." });
+  } catch (error) {
+    console.error(error);
   }
-);
+});
 
 //create order
 router.post("/order", csrfMiddleware, isLoggedIn, async (req, res, next) => {
   try {
-    const { number, clientName, products, quantity, checkout } = req.body;
+    const data = req.body;
+    console.log("Data to Order: ", data);
     const newOrder = new Order({
-      number,
-      clientName,
-      products,
-      quantity,
-      checkout,
+      clientName: data.firstName + " " + data.lastName,
+      products: data.cart,
+      checkout: false,
     });
     await newOrder.save();
     res.json({ message: "Succesfully created order", order: newOrder });
