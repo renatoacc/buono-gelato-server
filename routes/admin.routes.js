@@ -51,6 +51,25 @@ router.post("/products", singleUpload, async (req, res, next) => {
   }
 });
 
+router.get(
+  "/products/:id",
+  csrfMiddleware,
+  isLoggedIn,
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      //console.log(id);
+      const oneProduct = await Product.findById(id);
+      //console.log(oneProduct);
+      res.json(oneProduct);
+    } catch (err) {
+      res.status(400).json({
+        errorMessage: "Error in fetching products from server! " + err.message,
+      });
+    }
+  }
+);
+
 router.put("/products/:id", singleUpload, async (req, res, next) => {
   //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file, ">>>>>>>>>>>>>>", req.body);
   //console.log(req.params, req.body)
@@ -115,6 +134,24 @@ router.get(
     }
   }
 );
+router.get(
+  "/ingredients/:id",
+  csrfMiddleware,
+  isLoggedIn,
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      //console.log(id);
+      const oneIngredient = await Ingredients.findById(id);
+      console.log(oneIngredient);
+      res.json(oneIngredient);
+    } catch (err) {
+      res.status(400).json({
+        errorMessage: "Error in fetching ingredients from server! " + err.message,
+      });
+    }
+  }
+);
 
 router.post(
   "/ingredients",
@@ -122,7 +159,7 @@ router.post(
   async (req, res, next) => {
 
     try {
-      console.log( ">>>>>>>>>>>>>>", req.body);
+      //console.log( ">>>>>>>>>>>>>>", req.body);
       const { name, typeIngredient, price, description } = req.body;
       const newIngredient = new Ingredients({ name, typeIngredient, price, description });
       await newIngredient.save();
@@ -142,7 +179,7 @@ router.put(
   "/ingredients/:id",
  
   async (req, res, next) => {
-    console.log(req.params)
+    //console.log(req.params)
     try {
     const {id}  = req.params
     const {name, typeIngredient, price, description } = req.body;
