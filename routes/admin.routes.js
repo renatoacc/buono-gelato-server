@@ -31,16 +31,16 @@ router.get(
 
 
 router.post("/products", singleUpload, async (req, res, next) => {
-  //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.body)
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.body)
   try {
-    const { name, typeProduct, price, extraIngredients, description } = req.body;
+    const { name, typeProduct, price, extraIngredients, description, productImage } = req.body;
     const newProduct = new Product({
       name,
       typeProduct,
       price,
       description,
       extraIngredients,
-      // productImage: req.file.location,
+      productImage,
     });
     await newProduct.save();
     res.json({ message: "Succesfully created Product", product: newProduct });
