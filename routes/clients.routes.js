@@ -121,8 +121,16 @@ router.put("/favoritAdd", isLoggedIn, async (req, res, next) => {
     const userId = req.session.user._id;
     const response = await User.findById(userId);
     const favortiArray = response.favourites;
-    favortiArray.push(data);
-    await User.findByIdAndUpdate(userId, { favourites: favortiArray });
+    let filterArray = null;
+    favortiArray.forEach((elem) => {
+      if (elem._id === data._id) {
+        return (filterArray = true);
+      }
+    });
+    if (!filterArray) {
+      favortiArray.push(data);
+      await User.findByIdAndUpdate(userId, { favourites: favortiArray });
+    }
   } catch (error) {
     console.error(error);
   }
