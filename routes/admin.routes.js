@@ -5,91 +5,83 @@ const Product = require("../models/Products.model");
 const Orders = require("../models/Orders.model");
 const isAdmin = require("../middlewares/isAdmin");
 const csrfMiddleware = require("../middlewares/csrfMiddleware");
-const uploader= require('../middlewares/cloudinary.config.js');
+const uploader = require("../middlewares/cloudinary.config.js");
 
 //PRODUCTS ROUTES
 
-router.get(
-  "/showproducts",
-  csrfMiddleware,
-  isAdmin,
-  async (req, res, next) => {
-    try {
-      const product = await Product.find();
-      res.json( product );
-    } catch (err) {
-      res.status(400).json({
-        errorMessage: "Error in fetching products from server! " + err.message,
-      });
-    }
-  }
-);
-
-
-router.post("/products", csrfMiddleware,
-isAdmin, uploader.single("productImage"), async (req, res, next) => {
-  //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.body)
-  //console.log('file is: ', req.file)
-
+router.get("/showproducts", csrfMiddleware, isAdmin, async (req, res, next) => {
   try {
-   
-    const { name, typeProduct, price, extraIngredients, description } = req.body;
-    const newProduct = new Product({
-      name,
-      typeProduct,
-      price,
-      description,
-      extraIngredients,
-      productImage: req.file.path,
-    });
-    await newProduct.save();
-    res.json({ message: "Succesfully created Product", product: newProduct });
+    const product = await Product.find();
+    res.json(product);
   } catch (err) {
     res.status(400).json({
-      errorMessage: "Please provide correct request body! " + err.message,
+      errorMessage: "Error in fetching products from server! " + err.message,
     });
   }
 });
 
-router.get(
-  "/products/:id",
-  csrfMiddleware,
+router.post(
+  "/products",
   isAdmin,
+  uploader.single("productImage"),
   async (req, res, next) => {
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.body);
+    console.log("file is: ", req.file);
+
     try {
-      const { id } = req.params;
-      //console.log(id);
-      const oneProduct = await Product.findById(id);
-      //console.log(oneProduct);
-      res.json(oneProduct);
+      const { name, typeProduct, price, extraIngredients, description } =
+        req.body;
+      const newProduct = new Product({
+        name,
+        typeProduct,
+        price,
+        description,
+        extraIngredients,
+        productImage: req.file.path,
+      });
+      await newProduct.save();
+      res.json({ message: "Succesfully created Product", product: newProduct });
     } catch (err) {
       res.status(400).json({
-        errorMessage: "Error in fetching products from server! " + err.message,
+        errorMessage: "Please provide correct request body! " + err.message,
       });
     }
   }
 );
 
-router.put("/products/:id", csrfMiddleware,
-isAdmin, async (req, res, next) => {
+router.get("/products/:id", csrfMiddleware, isAdmin, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    //console.log(id);
+    const oneProduct = await Product.findById(id);
+    //console.log(oneProduct);
+    res.json(oneProduct);
+  } catch (err) {
+    res.status(400).json({
+      errorMessage: "Error in fetching products from server! " + err.message,
+    });
+  }
+});
+
+router.put("/products/:id", csrfMiddleware, isAdmin, async (req, res, next) => {
   //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file, ">>>>>>>>>>>>>>", req.body);
   //console.log(req.params, req.body)
   try {
-    const {id}  = req.params
-    const {name, typeProduct, price, description } = req.body;
+    const { id } = req.params;
+    const { name, typeProduct, price, description } = req.body;
     // const image = req.file.location;
     if (!id) {
       return res
         .status(400)
         .json({ errorMessage: "Please provide a valid _id in your request" });
     }
-    
+
     const afterUpdateProduct = await Product.findByIdAndUpdate(
       id,
       { name, typeProduct, price, description },
       { new: true }
     );
-  
+
     res.json({
       message: "Successfully updated product!",
       updatedProduct: afterUpdateProduct,
@@ -102,13 +94,14 @@ isAdmin, async (req, res, next) => {
 });
 
 router.post(
-  "/products/delete/:id", csrfMiddleware,
+  "/products/delete/:id",
+  csrfMiddleware,
   isAdmin,
 
   async (req, res, next) => {
     console.log(">>>>>>>>>>>>>>", req.params);
     try {
-      const {id} = req.params;
+      const { id } = req.params;
       await Product.findByIdAndDelete(id);
       res.json({ message: "Successfully delete Product " + id });
     } catch (err) {
@@ -122,13 +115,14 @@ router.post(
 //INGREDIENTS ROUTES
 
 router.get(
-  "/showingredients", csrfMiddleware,
+  "/showingredients",
+  csrfMiddleware,
   isAdmin,
 
   async (req, res, next) => {
     try {
       const ingredient = await Ingredients.find();
-      res.json( ingredient );
+      res.json(ingredient);
     } catch (err) {
       res.status(400).json({
         errorMessage:
@@ -150,22 +144,28 @@ router.get(
       res.json(oneIngredient);
     } catch (err) {
       res.status(400).json({
-        errorMessage: "Error in fetching ingredients from server! " + err.message,
+        errorMessage:
+          "Error in fetching ingredients from server! " + err.message,
       });
     }
   }
 );
 
 router.post(
-  "/ingredients", csrfMiddleware,
+  "/ingredients",
+  csrfMiddleware,
   isAdmin,
 
   async (req, res, next) => {
-
     try {
       //console.log( ">>>>>>>>>>>>>>", req.body);
       const { name, typeIngredient, price, description } = req.body;
-      const newIngredient = new Ingredients({ name, typeIngredient, price, description });
+      const newIngredient = new Ingredients({
+        name,
+        typeIngredient,
+        price,
+        description,
+      });
       await newIngredient.save();
       res.json({
         message: "Succesfully create new Ingredient",
@@ -180,13 +180,14 @@ router.post(
 );
 
 router.put(
-  "/ingredients/:id", csrfMiddleware,
+  "/ingredients/:id",
+  csrfMiddleware,
   isAdmin,
   async (req, res, next) => {
     //console.log(req.params)
     try {
-    const {id}  = req.params
-    const {name, typeIngredient, price, description } = req.body;
+      const { id } = req.params;
+      const { name, typeIngredient, price, description } = req.body;
       if (!id) {
         return res
           .status(400)
@@ -210,10 +211,11 @@ router.put(
 );
 
 router.post(
-  "/ingredients/delete/:id", csrfMiddleware,
+  "/ingredients/delete/:id",
+  csrfMiddleware,
   isAdmin,
   async (req, res, next) => {
-    console.log(req.params)
+    console.log(req.params);
     try {
       const { id } = req.params;
       await Ingredients.findByIdAndDelete(id);
@@ -228,32 +230,27 @@ router.post(
 
 //ORDERS ROUTES
 
-router.get(
-  "/vieworders",
-  csrfMiddleware,
-  isAdmin,
-  async (req, res, next) => {
-    try {
-      const orders = await Orders.find();
-      res.json( orders );
-      console.log(orders)
-    } catch (err) {
-      res.status(400).json({
-        errorMessage: "Error in fetching orders from server! " + err.message,
-      });
-    }
+router.get("/vieworders", csrfMiddleware, isAdmin, async (req, res, next) => {
+  try {
+    const orders = await Orders.find();
+    res.json(orders);
+    console.log(orders);
+  } catch (err) {
+    res.status(400).json({
+      errorMessage: "Error in fetching orders from server! " + err.message,
+    });
   }
-);
+});
 
 router.put(
-  "/vieworders/:id", csrfMiddleware,
+  "/vieworders/:id",
+  csrfMiddleware,
   isAdmin,
- 
+
   async (req, res, next) => {
-  
     try {
-    const {id}  = req.params
-    const {clientName, products, checkout } = req.body;
+      const { id } = req.params;
+      const { clientName, products, checkout } = req.body;
       if (!id) {
         return res
           .status(400)
@@ -261,7 +258,7 @@ router.put(
       }
       const afterUpdateStatus = await Orders.findByIdAndUpdate(
         id,
-        {clientName, products, checkout: true },
+        { clientName, products, checkout: true },
         { new: true }
       );
       res.json({
@@ -278,7 +275,9 @@ router.put(
 
 router.get("/admin", async (req, res, next) => {
   try {
-    req.session.user && req.session.user.userType === "admin" ? res.json(req.session.user) : res.json(null);
+    req.session.user && req.session.user.userType === "admin"
+      ? res.json(req.session.user)
+      : res.json(null);
   } catch (error) {
     console.error(error);
   }

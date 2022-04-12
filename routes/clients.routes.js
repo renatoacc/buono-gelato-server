@@ -170,7 +170,7 @@ router.put("/deleteCart/:id", isLoggedIn, async (req, res, next) => {
 });
 
 //create order
-router.post("/order", csrfMiddleware, isLoggedIn, async (req, res, next) => {
+router.post("/order", isLoggedIn, async (req, res, next) => {
   try {
     const data = req.body;
     const newOrder = new Order({
