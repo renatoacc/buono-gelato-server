@@ -5,15 +5,14 @@ const Product = require("../models/Products.model");
 const Orders = require("../models/Orders.model");
 const isAdmin = require("../middlewares/isAdmin");
 const csrfMiddleware = require("../middlewares/csrfMiddleware");
-const upload= require('../middlewares/cloudinary.config.js');
+const uploader= require('../middlewares/cloudinary.config.js');
 
 //PRODUCTS ROUTES
 
 router.get(
   "/showproducts",
-  // csrfMiddleware,
-  // isLoggedIn,
-  // isAdmin,
+  csrfMiddleware,
+  isAdmin,
   async (req, res, next) => {
     try {
       const product = await Product.find();
@@ -27,13 +26,13 @@ router.get(
 );
 
 
-
-router.post("/products", upload.single("productImage"), async (req, res, next) => {
+router.post("/products", csrfMiddleware,
+isAdmin, uploader.single("productImage"), async (req, res, next) => {
   console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.body)
   console.log('file is: ', req.file)
 
   try {
-    const image = req.file;
+   
     const { name, typeProduct, price, extraIngredients, description } = req.body;
     const newProduct = new Product({
       name,
@@ -41,7 +40,7 @@ router.post("/products", upload.single("productImage"), async (req, res, next) =
       price,
       description,
       extraIngredients,
-      productImage: image.path,
+      productImage: req.file.path,
     });
     await newProduct.save();
     res.json({ message: "Succesfully created Product", product: newProduct });
@@ -55,7 +54,7 @@ router.post("/products", upload.single("productImage"), async (req, res, next) =
 router.get(
   "/products/:id",
   csrfMiddleware,
-  isLoggedIn,
+  isAdmin,
   async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -71,7 +70,8 @@ router.get(
   }
 );
 
-router.put("/products/:id", async (req, res, next) => {
+router.put("/products/:id", csrfMiddleware,
+isAdmin, async (req, res, next) => {
   //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file, ">>>>>>>>>>>>>>", req.body);
   //console.log(req.params, req.body)
   try {
@@ -102,7 +102,8 @@ router.put("/products/:id", async (req, res, next) => {
 });
 
 router.post(
-  "/products/delete/:id",
+  "/products/delete/:id", csrfMiddleware,
+  isAdmin,
 
   async (req, res, next) => {
     console.log(">>>>>>>>>>>>>>", req.params);
@@ -121,7 +122,8 @@ router.post(
 //INGREDIENTS ROUTES
 
 router.get(
-  "/showingredients",
+  "/showingredients", csrfMiddleware,
+  isAdmin,
 
   async (req, res, next) => {
     try {
@@ -138,7 +140,7 @@ router.get(
 router.get(
   "/ingredients/:id",
   csrfMiddleware,
-  isLoggedIn,
+  isAdmin,
   async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -155,7 +157,8 @@ router.get(
 );
 
 router.post(
-  "/ingredients",
+  "/ingredients", csrfMiddleware,
+  isAdmin,
 
   async (req, res, next) => {
 
@@ -177,8 +180,8 @@ router.post(
 );
 
 router.put(
-  "/ingredients/:id",
- 
+  "/ingredients/:id", csrfMiddleware,
+  isAdmin,
   async (req, res, next) => {
     //console.log(req.params)
     try {
@@ -207,7 +210,8 @@ router.put(
 );
 
 router.post(
-  "/ingredients/delete/:id",
+  "/ingredients/delete/:id", csrfMiddleware,
+  isAdmin,
   async (req, res, next) => {
     console.log(req.params)
     try {
@@ -226,9 +230,8 @@ router.post(
 
 router.get(
   "/vieworders",
-  // csrfMiddleware,
-  // isLoggedIn,
-  // isAdmin,
+  csrfMiddleware,
+  isAdmin,
   async (req, res, next) => {
     try {
       const orders = await Orders.find();
@@ -238,6 +241,37 @@ router.get(
       res.status(400).json({
         errorMessage: "Error in fetching orders from server! " + err.message,
       });
+    }
+  }
+);
+
+router.put(
+  "/vieworders/:id", csrfMiddleware,
+  isAdmin,
+ 
+  async (req, res, next) => {
+  
+    try {
+    const {id}  = req.params
+    const {clientName, products, checkout } = req.body;
+      if (!id) {
+        return res
+          .status(400)
+          .json({ errorMessage: "Please provide a valid _id in your request" });
+      }
+      const afterUpdateStatus = await Orders.findByIdAndUpdate(
+        id,
+        {clientName, products, checkout: true },
+        { new: true }
+      );
+      res.json({
+        message: "Successfully updated ingredient!",
+        updated: afterUpdateStatus,
+      });
+    } catch (err) {
+      res
+        .status(400)
+        .json({ errorMessage: "Error in updating ingredient! " + err.message });
     }
   }
 );
