@@ -37,7 +37,6 @@ router.get(
   async (req, res, next) => {
     try {
       const { id } = req.params;
-      console.log("Get user id:", id);
       const { _id, firstName, lastName, cart } = await User.findById(id);
       const oneUserData = { _id, firstName, lastName, cart };
       res.json(oneUserData);
@@ -50,7 +49,6 @@ router.get(
 router.put("/addCart", isLoggedIn, async (req, res, next) => {
   try {
     const { _id, cart } = req.body;
-    console.log("Data form the front end", _id, cart);
     if (!_id) {
       return res.status(400).json({ errorMessage: "Error ID" });
     }
@@ -65,7 +63,6 @@ router.put("/addCart", isLoggedIn, async (req, res, next) => {
 router.get("/shop", csrfMiddleware, isLoggedIn, async (req, res, next) => {
   try {
     const listProducts = await Product.find();
-    console.log(listProducts);
     res.json(listProducts);
   } catch (err) {
     res.status(400).json({
@@ -82,9 +79,7 @@ router.get(
   async (req, res, next) => {
     try {
       const { id } = req.params;
-      console.log(id);
       const oneProducts = await Product.findById(id);
-      console.log(oneProducts);
       res.json(oneProducts);
     } catch (err) {
       res.status(400).json({
@@ -100,21 +95,20 @@ router.get("/cart:id", csrfMiddleware, isLoggedIn, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { _id, firstName, lastName, cart } = await User.findById(id);
-    console.log({ _id, firstName, lastName, cart });
     res.json({ _id, firstName, lastName, cart });
   } catch (error) {
-    console.log("Error cart user data", error);
+    console.error("Error cart user data", error);
   }
 });
 
 router.put("/cartDeleteElement/", isLoggedIn, async (req, res, next) => {
   try {
     const data = req.body;
-    console.log("console.log da linha 113 do server side:", data);
-    const response = await User.findById(data[0]);
+    const userId = req.session.user._id;
+    const response = await User.findById(userId);
     const fullUserData = response.cart;
-    fullUserData.splice(data[2], 1);
-    await User.findByIdAndUpdate(data[0], { cart: fullUserData });
+    fullUserData.splice(data, 1);
+    await User.findByIdAndUpdate(userId, { cart: fullUserData });
     res.json({ message: "delete item successfully!" });
   } catch (error) {
     console.error(error);
@@ -124,11 +118,11 @@ router.put("/cartDeleteElement/", isLoggedIn, async (req, res, next) => {
 router.put("/favoritAdd", isLoggedIn, async (req, res, next) => {
   try {
     const data = req.body;
-    const response = await User.findById(data[0]);
-    console.log(data[1]);
+    const userId = req.session.user._id;
+    const response = await User.findById(userId);
     const favortiArray = response.favourites;
-    favortiArray.push(data[1]);
-    await User.findByIdAndUpdate(data[0], { favourites: favortiArray });
+    favortiArray.push(data);
+    await User.findByIdAndUpdate(userId, { favourites: favortiArray });
   } catch (error) {
     console.error(error);
   }
@@ -137,7 +131,6 @@ router.put("/favoritAdd", isLoggedIn, async (req, res, next) => {
 router.put("/favoriteRemove/:id", isLoggedIn, async (req, res, next) => {
   try {
     const { id } = req.params;
-    console.log("Console.log ID form 140:", id);
     const userId = req.session.user._id;
     const response = await User.findById(userId);
     let removeIndex = null;
@@ -147,9 +140,9 @@ router.put("/favoriteRemove/:id", isLoggedIn, async (req, res, next) => {
         return;
       }
     });
-    console.log("Console.log Remove Index form 146:", removeIndex);
     response.favourites.splice(removeIndex, 1);
     await response.save();
+    res.json(true);
   } catch (error) {
     console.error(error);
   }
@@ -180,7 +173,6 @@ router.put("/deleteCart/:id", isLoggedIn, async (req, res, next) => {
 router.post("/order", csrfMiddleware, isLoggedIn, async (req, res, next) => {
   try {
     const data = req.body;
-    console.log("Data to Order: ", data);
     const newOrder = new Order({
       clientName: data.firstName + " " + data.lastName,
       products: data.cart,
