@@ -244,7 +244,6 @@ router.get("/vieworders", csrfMiddleware, isAdmin, async (req, res, next) => {
 
 router.put(
   "/vieworders/:id",
-  csrfMiddleware,
   isAdmin,
 
   async (req, res, next) => {
