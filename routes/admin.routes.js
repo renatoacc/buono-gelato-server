@@ -28,8 +28,8 @@ router.get(
 
 router.post("/products", csrfMiddleware,
 isAdmin, uploader.single("productImage"), async (req, res, next) => {
-  console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.body)
-  console.log('file is: ', req.file)
+  //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.body)
+  //console.log('file is: ', req.file)
 
   try {
    
@@ -275,5 +275,13 @@ router.put(
     }
   }
 );
+
+router.get("/admin", async (req, res, next) => {
+  try {
+    req.session.user && req.session.user.userType === "admin" ? res.json(req.session.user) : res.json(null);
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 module.exports = router;

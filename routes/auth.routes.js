@@ -45,7 +45,7 @@ router.post("/signup", async (req, res, next) => {
 
 router.post("/login", async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, } = req.body;
     const user = await User.findOne({ email });
     console.log(user);
     if (!user) {
@@ -56,7 +56,7 @@ router.post("/login", async (req, res, next) => {
       throw Error();
     }
 
-    const sessionUser = { email: user.email, _id: user._id };
+    const sessionUser = { email: user.email, _id: user._id, userType: user.userType };
     req.session.user = sessionUser;
     return res.json({ message: "Successfully logged in!", user: sessionUser });
   } catch (err) {
