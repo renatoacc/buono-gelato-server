@@ -17,7 +17,7 @@ router.get("/logged", async (req, res, next) => {
 
 router.get(
   "/userInfo/:id",
-  csrfMiddleware,
+
   isLoggedIn,
   async (req, res, next) => {
     try {
@@ -32,7 +32,7 @@ router.get(
 
 router.get(
   "/datauser/:id",
-  csrfMiddleware,
+  
   isLoggedIn,
   async (req, res, next) => {
     try {
@@ -91,7 +91,7 @@ router.get(
 
 // Show cart user information to checkout
 
-router.get("/cart:id", csrfMiddleware, isLoggedIn, async (req, res, next) => {
+router.get("/cart:id",  isLoggedIn, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { _id, firstName, lastName, cart } = await User.findById(id);
