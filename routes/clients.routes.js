@@ -15,36 +15,26 @@ router.get("/logged", async (req, res, next) => {
   }
 });
 
-router.get(
-  "/userInfo/:id",
-  csrfMiddleware,
-  isLoggedIn,
-  async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      const data = await User.findById(id);
-      res.json(data);
-    } catch (error) {
-      console.error("Error take data from the database", error);
-    }
+router.get("/userInfo/:id", isLoggedIn, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const data = await User.findById(id);
+    res.json(data);
+  } catch (error) {
+    console.error("Error take data from the database", error);
   }
-);
+});
 
-router.get(
-  "/datauser/:id",
-  csrfMiddleware,
-  isLoggedIn,
-  async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      const { _id, firstName, lastName, cart } = await User.findById(id);
-      const oneUserData = { _id, firstName, lastName, cart };
-      res.json(oneUserData);
-    } catch (error) {
-      console.error("Error to get the user data:", error);
-    }
+router.get("/datauser/:id", isLoggedIn, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { _id, firstName, lastName, cart } = await User.findById(id);
+    const oneUserData = { _id, firstName, lastName, cart };
+    res.json(oneUserData);
+  } catch (error) {
+    console.error("Error to get the user data:", error);
   }
-);
+});
 // Update cart Array
 router.put("/addCart", isLoggedIn, async (req, res, next) => {
   try {
@@ -60,7 +50,7 @@ router.put("/addCart", isLoggedIn, async (req, res, next) => {
 });
 
 //list products
-router.get("/shop", csrfMiddleware, isLoggedIn, async (req, res, next) => {
+router.get("/shop", isLoggedIn, async (req, res, next) => {
   try {
     const listProducts = await Product.find();
     res.json(listProducts);
@@ -72,22 +62,17 @@ router.get("/shop", csrfMiddleware, isLoggedIn, async (req, res, next) => {
 });
 
 // find one product
-router.get(
-  "/product/:id",
-  csrfMiddleware,
-  isLoggedIn,
-  async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      const oneProducts = await Product.findById(id);
-      res.json(oneProducts);
-    } catch (err) {
-      res.status(400).json({
-        errorMessage: "Error in fetching products from server! " + err.message,
-      });
-    }
+router.get("/product/:id", isLoggedIn, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const oneProducts = await Product.findById(id);
+    res.json(oneProducts);
+  } catch (err) {
+    res.status(400).json({
+      errorMessage: "Error in fetching products from server! " + err.message,
+    });
   }
-);
+});
 
 // Show cart user information to checkout
 
