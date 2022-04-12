@@ -16,6 +16,21 @@ router.get("/logged", async (req, res, next) => {
 });
 
 router.get(
+  "/userInfo/:id",
+  csrfMiddleware,
+  isLoggedIn,
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const data = await User.findById(id);
+      res.json(data);
+    } catch (error) {
+      console.error("Error take data from the database", error);
+    }
+  }
+);
+
+router.get(
   "/datauser/:id",
   csrfMiddleware,
   isLoggedIn,
@@ -27,7 +42,7 @@ router.get(
       const oneUserData = { _id, firstName, lastName, cart };
       res.json(oneUserData);
     } catch (error) {
-      console.error("Erro to get the user data:", error);
+      console.error("Error to get the user data:", error);
     }
   }
 );
@@ -89,6 +104,33 @@ router.get("/cart:id", csrfMiddleware, isLoggedIn, async (req, res, next) => {
     res.json({ _id, firstName, lastName, cart });
   } catch (error) {
     console.log("Error cart user data", error);
+  }
+});
+
+router.put("/cartDeleteElement/", isLoggedIn, async (req, res, next) => {
+  try {
+    const data = req.body;
+    console.log("console.log da linha 113 do server side:", data);
+    const response = await User.findById(data[0]);
+    const fullUserData = response.cart;
+    fullUserData.splice(data[2], 1);
+    await User.findByIdAndUpdate(data[0], { cart: fullUserData });
+    res.json({ message: "delete item successfully!" });
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+router.put("/favoritAdd", isLoggedIn, async (req, res, next) => {
+  try {
+    const data = req.body;
+    const response = await User.findById(data[0]);
+    console.log(data[1]);
+    const favortiArray = response.favourites;
+    favortiArray.push(data[1]);
+    await User.findByIdAndUpdate(data[0], { favourites: favortiArray });
+  } catch (error) {
+    console.error(error);
   }
 });
 
