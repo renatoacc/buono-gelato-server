@@ -9,7 +9,7 @@ const uploader = require("../middlewares/cloudinary.config.js");
 
 //PRODUCTS ROUTES
 
-router.get("/showproducts", csrfMiddleware, isAdmin, async (req, res, next) => {
+router.get("/showproducts", isAdmin, async (req, res, next) => {
   try {
     const product = await Product.find();
     res.json(product);
@@ -49,7 +49,7 @@ router.post(
   }
 );
 
-router.get("/products/:id", csrfMiddleware, isAdmin, async (req, res, next) => {
+router.get("/products/:id", isAdmin, async (req, res, next) => {
   try {
     const { id } = req.params;
     //console.log(id);
@@ -63,7 +63,7 @@ router.get("/products/:id", csrfMiddleware, isAdmin, async (req, res, next) => {
   }
 });
 
-router.put("/products/:id", csrfMiddleware, isAdmin, async (req, res, next) => {
+router.put("/products/:id", isAdmin, async (req, res, next) => {
   //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file, ">>>>>>>>>>>>>>", req.body);
   //console.log(req.params, req.body)
   try {
@@ -95,11 +95,9 @@ router.put("/products/:id", csrfMiddleware, isAdmin, async (req, res, next) => {
 
 router.post(
   "/products/delete/:id",
-  csrfMiddleware,
   isAdmin,
 
   async (req, res, next) => {
-    console.log(">>>>>>>>>>>>>>", req.params);
     try {
       const { id } = req.params;
       await Product.findByIdAndDelete(id);
@@ -116,7 +114,6 @@ router.post(
 
 router.get(
   "/showingredients",
-  csrfMiddleware,
   isAdmin,
 
   async (req, res, next) => {
@@ -131,29 +128,22 @@ router.get(
     }
   }
 );
-router.get(
-  "/ingredients/:id",
-  csrfMiddleware,
-  isAdmin,
-  async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      //console.log(id);
-      const oneIngredient = await Ingredients.findById(id);
-      console.log(oneIngredient);
-      res.json(oneIngredient);
-    } catch (err) {
-      res.status(400).json({
-        errorMessage:
-          "Error in fetching ingredients from server! " + err.message,
-      });
-    }
+router.get("/ingredients/:id", isAdmin, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    //console.log(id);
+    const oneIngredient = await Ingredients.findById(id);
+    console.log(oneIngredient);
+    res.json(oneIngredient);
+  } catch (err) {
+    res.status(400).json({
+      errorMessage: "Error in fetching ingredients from server! " + err.message,
+    });
   }
-);
+});
 
 router.post(
   "/ingredients",
-  csrfMiddleware,
   isAdmin,
 
   async (req, res, next) => {
@@ -179,58 +169,47 @@ router.post(
   }
 );
 
-router.put(
-  "/ingredients/:id",
-  csrfMiddleware,
-  isAdmin,
-  async (req, res, next) => {
-    //console.log(req.params)
-    try {
-      const { id } = req.params;
-      const { name, typeIngredient, price, description } = req.body;
-      if (!id) {
-        return res
-          .status(400)
-          .json({ errorMessage: "Please provide a valid _id in your request" });
-      }
-      const afterUpdateIngredient = await Ingredients.findByIdAndUpdate(
-        id,
-        { name, typeIngredient, price, description },
-        { new: true }
-      );
-      res.json({
-        message: "Successfully updated ingredient!",
-        updatedIngredient: afterUpdateIngredient,
-      });
-    } catch (err) {
-      res
+router.put("/ingredients/:id", isAdmin, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { name, typeIngredient, price, description } = req.body;
+    if (!id) {
+      return res
         .status(400)
-        .json({ errorMessage: "Error in updating ingredient! " + err.message });
+        .json({ errorMessage: "Please provide a valid _id in your request" });
     }
+    const afterUpdateIngredient = await Ingredients.findByIdAndUpdate(
+      id,
+      { name, typeIngredient, price, description },
+      { new: true }
+    );
+    res.json({
+      message: "Successfully updated ingredient!",
+      updatedIngredient: afterUpdateIngredient,
+    });
+  } catch (err) {
+    res
+      .status(400)
+      .json({ errorMessage: "Error in updating ingredient! " + err.message });
   }
-);
+});
 
-router.post(
-  "/ingredients/delete/:id",
-  csrfMiddleware,
-  isAdmin,
-  async (req, res, next) => {
-    console.log(req.params);
-    try {
-      const { id } = req.params;
-      await Ingredients.findByIdAndDelete(id);
-      res.json({ message: "Successfully delete ingredient" + id });
-    } catch (err) {
-      res
-        .status(400)
-        .json({ errorMessage: "Error in deleting ingredient! " + err.message });
-    }
+router.post("/ingredients/delete/:id", isAdmin, async (req, res, next) => {
+  console.log(req.params);
+  try {
+    const { id } = req.params;
+    await Ingredients.findByIdAndDelete(id);
+    res.json({ message: "Successfully delete ingredient" + id });
+  } catch (err) {
+    res
+      .status(400)
+      .json({ errorMessage: "Error in deleting ingredient! " + err.message });
   }
-);
+});
 
 //ORDERS ROUTES
 
-router.get("/vieworders", csrfMiddleware, isAdmin, async (req, res, next) => {
+router.get("/vieworders", isAdmin, async (req, res, next) => {
   try {
     const orders = await Orders.find();
     res.json(orders);
@@ -244,7 +223,6 @@ router.get("/vieworders", csrfMiddleware, isAdmin, async (req, res, next) => {
 
 router.put(
   "/vieworders/:id",
-  csrfMiddleware,
   isAdmin,
 
   async (req, res, next) => {
