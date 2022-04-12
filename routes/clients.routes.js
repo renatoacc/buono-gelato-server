@@ -134,6 +134,38 @@ router.put("/favoritAdd", isLoggedIn, async (req, res, next) => {
   }
 });
 
+router.put("/favoriteRemove/:id", isLoggedIn, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    console.log("Console.log ID form 140:", id);
+    const userId = req.session.user._id;
+    const response = await User.findById(userId);
+    let removeIndex = null;
+    response.favourites.forEach((element, index) => {
+      if (element._id.includes(id)) {
+        removeIndex = index;
+        return;
+      }
+    });
+    console.log("Console.log Remove Index form 146:", removeIndex);
+    response.favourites.splice(removeIndex, 1);
+    await response.save();
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+router.get("/listFavorit/:id", isLoggedIn, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    console.log(id);
+    const data = await User.findById(id);
+    res.json(data);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
 router.put("/deleteCart/:id", isLoggedIn, async (req, res, next) => {
   try {
     const { id } = req.params;

@@ -58,11 +58,8 @@ router.post("/login", async (req, res, next) => {
 
     const sessionUser = { email: user.email, _id: user._id };
     req.session.user = sessionUser;
-    // console.log("ERROOOOOOOOOOO ESTÁ AQUI ", req.session);
     return res.json({ message: "Successfully logged in!", user: sessionUser });
   } catch (err) {
-    //console.error(err);
-
     return res.status(400).json({
       errorMessage: "Something went wrong - email or password don't match",
     });
@@ -70,8 +67,6 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.post("/logout", async (req, res, next) => {
-  //console.log("Trying to logout!");
-
   req.session.destroy((err) => {
     if (err) next(err);
     return res.json({ message: "Successfully logged out!" });
