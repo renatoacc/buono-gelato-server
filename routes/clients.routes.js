@@ -88,13 +88,16 @@ router.get("/cart:id", csrfMiddleware, isLoggedIn, async (req, res, next) => {
 
 router.put("/cartDeleteElement/", isLoggedIn, async (req, res, next) => {
   try {
-    const data = req.body;
+    const { index } = req.body;
+    console.log(index);
     const userId = req.session.user._id;
     const response = await User.findById(userId);
     const fullUserData = response.cart;
-    fullUserData.splice(data, 1);
-    await User.findByIdAndUpdate(userId, { cart: fullUserData });
-    res.json({ message: "delete item successfully!" });
+    fullUserData.splice(index, 1);
+    const updateCart = await User.findByIdAndUpdate(userId, {
+      cart: fullUserData,
+    });
+    res.json(updateCart);
   } catch (error) {
     console.error(error);
   }
@@ -104,8 +107,8 @@ router.put("/favoritAdd", isLoggedIn, async (req, res, next) => {
   try {
     const data = req.body;
     const userId = req.session.user._id;
-    const response = await User.findById(userId);
-    const favortiArray = response.favourites;
+    const userDataForUpdateFavorite = await User.findById(userId);
+    const favortiArray = userDataForUpdateFavorite.favourites;
     let filterArray = null;
     favortiArray.forEach((elem) => {
       if (elem._id === data._id) {
@@ -114,7 +117,8 @@ router.put("/favoritAdd", isLoggedIn, async (req, res, next) => {
     });
     if (!filterArray) {
       favortiArray.push(data);
-      await User.findByIdAndUpdate(userId, { favourites: favortiArray });
+      const updateUser = await userDataForUpdateFavorite.save();
+      res.json(updateUser);
     }
   } catch (error) {
     console.error(error);
