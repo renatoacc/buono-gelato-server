@@ -15,7 +15,6 @@ router.get("/logged", async (req, res, next) => {
   }
 });
 
-
 router.get("/userInfo/:id", isLoggedIn, async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -25,7 +24,6 @@ router.get("/userInfo/:id", isLoggedIn, async (req, res, next) => {
     console.error("Error take data from the database", error);
   }
 });
-
 
 router.get("/datauser/:id", isLoggedIn, async (req, res, next) => {
   try {
@@ -39,13 +37,24 @@ router.get("/datauser/:id", isLoggedIn, async (req, res, next) => {
 });
 
 // Update cart Array
-router.put("/addCart", isLoggedIn, async (req, res, next) => {
+router.post("/addCart", isLoggedIn, async (req, res, next) => {
   try {
-    const { _id, cart } = req.body;
-    if (!_id) {
-      return res.status(400).json({ errorMessage: "Error ID" });
+    const oneProducts = req.body;
+    const id = req.session.user._id;
+    const userAddCarData = await User.findById(id);
+    if (userAddCarData.cart.length == 0) {
+      userAddCarData.cart.push(oneProducts);
+      userAddCarData.save();
     }
-    await User.findByIdAndUpdate(_id, { cart: cart });
+    userAddCarData.cart.forEach((element) => {
+      if (element._id !== oneProducts._id) {
+        userAddCarData.cart.push(oneProducts);
+        userAddCarData.save();
+      } else {
+        const numberQuantity = Number(element.quantity);
+        element.quantity = numberQuantity + 1;
+      }
+    });
     res.json({ message: "Cart update Successfully." });
   } catch (error) {
     res.status(400).json({ errorMessage: "Erro Update Cart" });
@@ -79,7 +88,7 @@ router.get("/product/:id", isLoggedIn, async (req, res, next) => {
 
 // Show cart user information to checkout
 
-router.get("/cart:id",  isLoggedIn, async (req, res, next) => {
+router.get("/cart:id", isLoggedIn, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { _id, firstName, lastName, cart } = await User.findById(id);
