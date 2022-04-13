@@ -5,6 +5,7 @@ const Order = require("../models/Orders.model");
 const isLoggedIn = require("../middlewares/isLoggedIn");
 const csrfMiddleware = require("../middlewares/csrfMiddleware");
 const Orders = require("../models/Orders.model");
+const { AlexaForBusiness } = require("aws-sdk");
 
 // check if the user have the session
 router.get("/logged", async (req, res, next) => {
@@ -192,8 +193,9 @@ router.put("/deleteCart/:id", isLoggedIn, async (req, res, next) => {
 router.post("/order", isLoggedIn, async (req, res, next) => {
   try {
     const data = req.body;
+    const user = await User.findById(data._id);
     const newOrder = new Order({
-      clientName: data.firstName + " " + data.lastName,
+      clientName: user.firstName + " " + user.lastName,
       products: data.cart,
       checkout: false,
     });
