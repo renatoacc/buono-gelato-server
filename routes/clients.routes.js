@@ -41,22 +41,32 @@ router.post("/addCart", isLoggedIn, async (req, res, next) => {
   try {
     const oneProducts = req.body;
     const id = req.session.user._id;
-    const userAddCarData = await User.findById(id);
-    if (userAddCarData.cart.length == 0) {
-      userAddCarData.cart.push(oneProducts);
-      userAddCarData.save();
+    const user = await User.findById(id);
+    // userAddCarData.cart = userAddCarData.cart.reduce((acc, val, i) => {
+    //   if (val._id === oneProducts._id) {
+    //     console.log("ONEPRODUCT", oneProducts);
+    //     console.log("ACC VAlue", acc);
+    //     acc[i].quantity++;
+    //     return acc;
+    //   }
+    //   return [...acc, val];
+    // }, userAddCarData.cart);
+    // console.log(userAddCarData.cart);
+    // userAddCarData.save();
+    const index = user.cart.findIndex(
+      (element) => element._id === oneProducts._id
+    );
+    if (index !== -1) {
+      user.cart[index].quantity += 1;
+    } else {
+      user.cart.push(oneProducts);
     }
-    userAddCarData.cart.forEach((element) => {
-      if (element._id !== oneProducts._id) {
-        userAddCarData.cart.push(oneProducts);
-        userAddCarData.save();
-      } else {
-        const numberQuantity = Number(element.quantity);
-        element.quantity = numberQuantity + 1;
-      }
-    });
+    user.markModified("cart");
+    await user.save();
+
     res.json({ message: "Cart update Successfully." });
   } catch (error) {
+    console.log(error);
     res.status(400).json({ errorMessage: "Erro Update Cart" });
   }
 });
