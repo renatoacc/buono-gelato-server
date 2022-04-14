@@ -3,9 +3,6 @@ const Product = require("../models/Products.model");
 const User = require("../models/User.model");
 const Order = require("../models/Orders.model");
 const isLoggedIn = require("../middlewares/isLoggedIn");
-const csrfMiddleware = require("../middlewares/csrfMiddleware");
-const Orders = require("../models/Orders.model");
-const { AlexaForBusiness } = require("aws-sdk");
 
 // check if the user have the session
 router.get("/logged", async (req, res, next) => {
