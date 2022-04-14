@@ -63,8 +63,8 @@ router.get("/products/:id", isAdmin, async (req, res, next) => {
   }
 });
 
-router.put("/products/:id", isAdmin, async (req, res, next) => {
-  //console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file, ">>>>>>>>>>>>>>", req.body);
+router.put("/products/:id", isAdmin, uploader.single("productImage"), async (req, res, next) => {
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>", req.file, ">>>>>>>>>>>>>>", req.body);
   //console.log(req.params, req.body)
   try {
     const { id } = req.params;
@@ -75,10 +75,15 @@ router.put("/products/:id", isAdmin, async (req, res, next) => {
         .status(400)
         .json({ errorMessage: "Please provide a valid _id in your request" });
     }
-
     const afterUpdateProduct = await Product.findByIdAndUpdate(
       id,
-      { name, typeProduct, price, description },
+      { 
+        name,
+        typeProduct,
+        price,
+        description,
+        productImage: req.file.path,
+      } ,
       { new: true }
     );
 
