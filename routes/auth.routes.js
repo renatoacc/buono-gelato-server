@@ -5,17 +5,7 @@ const bcrypt = require("bcrypt");
 router.post("/signup", async (req, res, next) => {
   try {
     console.log(req.body);
-    const {
-      email,
-      password,
-      firstName,
-      lastName,
-      address,
-      city,
-      postcode,
-      vat,
-      phone,
-    } = req.body;
+    const { email, password, firstName, lastName } = req.body;
     const userAlreadyExists = await User.findOne({ email });
     if (userAlreadyExists) {
       return res.status(400).json({
@@ -29,11 +19,6 @@ router.post("/signup", async (req, res, next) => {
       password: passwordHash,
       firstName,
       lastName,
-      address,
-      city,
-      postcode,
-      vat,
-      phone,
     });
     await user.save();
     return res.json({ message: "Successfully signed up user" });
@@ -45,7 +30,7 @@ router.post("/signup", async (req, res, next) => {
 
 router.post("/login", async (req, res, next) => {
   try {
-    const { email, password, } = req.body;
+    const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
       throw Error();
@@ -55,7 +40,11 @@ router.post("/login", async (req, res, next) => {
       throw Error();
     }
 
-    const sessionUser = { email: user.email, _id: user._id, userType: user.userType };
+    const sessionUser = {
+      email: user.email,
+      _id: user._id,
+      userType: user.userType,
+    };
     req.session.user = sessionUser;
     return res.json({ message: "Successfully logged in!", user: sessionUser });
   } catch (err) {
