@@ -2,7 +2,7 @@ const router = require("express").Router();
 const Product = require("../models/Products.model");
 const User = require("../models/User.model");
 const Order = require("../models/Orders.model");
-// const isLoggedIn = require("../middlewares/isLoggedIn");
+const isLoggedIn = require("../middlewares/isLoggedIn");
 
 // check if the user have the session
 router.get("/logged", async (req, res, next) => {
@@ -13,7 +13,7 @@ router.get("/logged", async (req, res, next) => {
   }
 });
 
-router.get("/userInfo/:id", async (req, res, next) => {
+router.get("/userInfo/:id", isLoggedIn, async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = await User.findById(id);
@@ -23,7 +23,7 @@ router.get("/userInfo/:id", async (req, res, next) => {
   }
 });
 
-router.get("/datauser/:id", async (req, res, next) => {
+router.get("/datauser/:id", isLoggedIn, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { _id, firstName, lastName, cart } = await User.findById(id);
@@ -35,7 +35,7 @@ router.get("/datauser/:id", async (req, res, next) => {
 });
 
 // Update cart Array
-router.post("/addCart", async (req, res, next) => {
+router.post("/addCart", isLoggedIn, async (req, res, next) => {
   try {
     const oneProducts = req.body;
     const id = req.session.user._id;
@@ -70,7 +70,7 @@ router.post("/addCart", async (req, res, next) => {
 });
 
 //list products
-router.get("/shop", async (req, res, next) => {
+router.get("/shop", isLoggedIn, async (req, res, next) => {
   try {
     const listProducts = await Product.find();
     res.json(listProducts);
@@ -82,7 +82,7 @@ router.get("/shop", async (req, res, next) => {
 });
 
 // find one product
-router.get("/product/:id", async (req, res, next) => {
+router.get("/product/:id", isLoggedIn, async (req, res, next) => {
   try {
     const { id } = req.params;
     const oneProducts = await Product.findById(id);
@@ -96,7 +96,7 @@ router.get("/product/:id", async (req, res, next) => {
 
 // Show cart user information to checkout
 
-router.get("/cart:id", async (req, res, next) => {
+router.get("/cart:id", isLoggedIn, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { _id, firstName, lastName, cart } = await User.findById(id);
@@ -106,7 +106,7 @@ router.get("/cart:id", async (req, res, next) => {
   }
 });
 
-router.put("/cartDeleteElement/", async (req, res, next) => {
+router.put("/cartDeleteElement/", isLoggedIn, async (req, res, next) => {
   try {
     const { index } = req.body;
     console.log(index);
@@ -123,7 +123,7 @@ router.put("/cartDeleteElement/", async (req, res, next) => {
   }
 });
 
-router.put("/favoritAdd", async (req, res, next) => {
+router.put("/favoritAdd", isLoggedIn, async (req, res, next) => {
   try {
     const data = req.body;
     const userId = req.session.user._id;
@@ -145,7 +145,7 @@ router.put("/favoritAdd", async (req, res, next) => {
   }
 });
 
-router.put("/favoriteRemove/:id", async (req, res, next) => {
+router.put("/favoriteRemove/:id", isLoggedIn, async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.session.user._id;
@@ -165,7 +165,7 @@ router.put("/favoriteRemove/:id", async (req, res, next) => {
   }
 });
 
-router.get("/listFavorit/:id", async (req, res, next) => {
+router.get("/listFavorit/:id", isLoggedIn, async (req, res, next) => {
   try {
     const { id } = req.params;
     console.log(id);
@@ -176,7 +176,7 @@ router.get("/listFavorit/:id", async (req, res, next) => {
   }
 });
 
-router.put("/deleteCart/:id", async (req, res, next) => {
+router.put("/deleteCart/:id", isLoggedIn, async (req, res, next) => {
   try {
     const { id } = req.params;
     await User.findByIdAndUpdate(id, { cart: [] });
@@ -187,7 +187,7 @@ router.put("/deleteCart/:id", async (req, res, next) => {
 });
 
 //create order
-router.post("/order", async (req, res, next) => {
+router.post("/order", isLoggedIn, async (req, res, next) => {
   try {
     const data = req.body;
     const user = await User.findById(data._id);
