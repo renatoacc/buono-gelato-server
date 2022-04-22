@@ -5,17 +5,7 @@ const bcrypt = require("bcrypt");
 router.post("/signup", async (req, res, next) => {
   try {
     console.log(req.body);
-    const {
-      email,
-      password,
-      firstName,
-      lastName,
-      address,
-      city,
-      postcode,
-      vat,
-      phone,
-    } = req.body;
+    const { email, password, firstName, lastName } = req.body;
     const userAlreadyExists = await User.findOne({ email });
     if (userAlreadyExists) {
       return res.status(400).json({
@@ -29,13 +19,9 @@ router.post("/signup", async (req, res, next) => {
       password: passwordHash,
       firstName,
       lastName,
-      address,
-      city,
-      postcode,
-      vat,
-      phone,
     });
     await user.save();
+    console.log("Error creat a user", user);
     return res.json({ message: "Successfully signed up user" });
   } catch (err) {
     console.error(err);
