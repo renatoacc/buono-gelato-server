@@ -1,5 +1,6 @@
 // We reuse this import in order to have access to the `body` property in requests
 const express = require("express");
+const cors = require("cors");
 
 // ℹ️ Responsible for the messages you see in the terminal as requests are coming in
 // https://www.npmjs.com/package/morgan
@@ -14,7 +15,7 @@ const MongoStore = require("connect-mongo");
 
 // ℹ️ Needed to accept from requests from 'the outside'. CORS stands for cross origin resource sharing
 // unless the request if from the same domain, by default express wont accept POST requests
-const cors = require("cors");
+
 const session = require("express-session");
 const helmet = require("helmet");
 // Middleware configuration
@@ -41,7 +42,7 @@ module.exports = (app) => {
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         secure: process.env.NODE_ENV === "production",
         httpOnly: true,
-        maxAge: 600000, // 60 * 1000 ms * 10 === 10 min    
+        maxAge: 600000, // 60 * 1000 ms * 10 === 10 min
         // expires : new Date(Date.now() + 10000)
       },
       store: MongoStore.create({
@@ -52,7 +53,7 @@ module.exports = (app) => {
   );
 
   app.use(helmet());
-  app.use('/uploads', express.static("uploads"));
+  app.use("/uploads", express.static("uploads"));
   // In development environment the app logs
   app.use(logger("dev"));
 
